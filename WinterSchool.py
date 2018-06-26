@@ -103,6 +103,8 @@ def NCopener(xval=24):
 	#  perform the regression
 	print("Starting the regressions")
 	coef = threeDloop(xccount, enso)
+
+	np.save("./regression_coef.npy", coef)
 	plt.imshow(coef[:, :, 0])
 	plt.colorbar()
 	plt.show()

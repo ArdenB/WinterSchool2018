@@ -34,10 +34,24 @@ def main():
 		regress the enso and netcdf files
 	"""
 	# ========== Get the temperature data ==========
+	anuvals = NCopener(xval=24)
 
 #==============================================================================
-def NCopener():
-	""" """
+def NCopener(xval=24):
+	"""
+	Function opens the detrended NC file, then precesses it
+	args:
+		value  for extreme  threshold
+	 """
+	 # set the file name
+	 fn = "./AWAP_sel_DJF.nc "
+
+	 # load the data
+	 ncf1 = Dataset(fn, mode='r')
+
+	 tmin = ncf1.variables["tmin"][:]
+	 ipdb.set_trace()
+
 
 #==============================================================================
 

@@ -78,13 +78,26 @@ def NCopener(xval=24):
 	tmin[tmin>=xval] = 1
 
 
+
+
+
+	# Get an annual score
+	stack = []
+	years = range(1911, 2014)
+	for year in years:
+		# calculate the true fales array
+		ref = []
+		for dt in dates:
+			ref.append(dt == year)
+
+		stack.append(np.sum(tmin[:,:,ref], axis=2))
+	# stack the annual counds
+	xccount = np.dstack(stack)
 	# test plot
-	plt.imshow(np.sum(tmin, axis=2) )
+	plt.imshow(xccount[:, :, 1])
 	plt.colorbar()
 	plt.show()
 
-	# Print the max number
-	print(np.max(np.sum(tmin, axis=2))) 
 	ipdb.set_trace()
 
 #==============================================================================

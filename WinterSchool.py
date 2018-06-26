@@ -21,7 +21,7 @@ import matplotlib.pyplot as plt
 # import matplotlib as mpl
 # import palettable 
 # Import debugging packages 
-import ipdb
+# import ipdb
 
 #==============================================================================
 
@@ -69,7 +69,7 @@ def NCopener(xval=24):
 
 	# Print the max number
 	print(np.max(np.sum(tmin, axis=2))) 
-	ipdb.set_trace()
+	# ipdb.set_trace()
 
 
 #==============================================================================

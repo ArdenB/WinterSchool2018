@@ -20,9 +20,9 @@ import warnings as warn
 from netCDF4 import Dataset, num2date 
 # Import plotting and colorpackages
 import matplotlib.pyplot as plt
-# import matplotlib.colors as mpc
-# import matplotlib as mpl
-# import palettable 
+import matplotlib.colors as mpc
+import matplotlib as mpl
+import palettable 
 # Import debugging packages 
 import ipdb
 
@@ -105,10 +105,18 @@ def NCopener(xval=24):
 	coef = threeDloop(xccount, enso)
 
 	np.save("./regression_coef.npy", coef)
-	plt.imshow(coef[:, :, 0])
-	plt.colorbar()
-	plt.show()
+	# plt.imshow(coef[:, :, 0])
+	# plt.colorbar()
+	# plt.show()
 
+	# make a map
+	import Modules.PlotFunctions as pf
+	# build an object to hold the metadata
+	mapdet = pf.mapclass(region="AUS")
+	mapdet.cmap = cmap = mpc.ListedColormap(palettable.colorbrewer.diverging.RdBu_8_r.mpl_colors)
+	mapdet.cmin = - 0.4
+	mapdet.cmax =   0.4
+	pf.mapmaker(coef[:, :, 0], mapdet)
 	ipdb.set_trace()
 
 #==============================================================================

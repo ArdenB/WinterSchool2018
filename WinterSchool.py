@@ -9,6 +9,7 @@ __email__ = "arden.burrell@gmail.com"
 #==============================================================================
 # Import packages
 import numpy as np
+import scipy as sp
 import pandas as pd
 import argparse
 import datetime as dt
@@ -62,15 +63,18 @@ def NCopener(xval=24):
 	tmin[tmin <xval] = 0
 	tmin[tmin>=xval] = 1
 
+	# detrend the data
+	from scipy import signal
+	dtmin_det = signal.detrend(tmin, axis=2, type='linear')
+
 	# test plot
-	plt.imshow(np.sum(tmin, axis=2) )
+	plt.imshow(np.sum(tmin_det, axis=2) )
 	plt.colorbar()
 	plt.show()
 
 	# Print the max number
-	print(np.max(np.sum(tmin, axis=2))) 
+	print(np.max(np.sum(tmin_det, axis=2))) 
 	# ipdb.set_trace()
-
 
 #==============================================================================
 

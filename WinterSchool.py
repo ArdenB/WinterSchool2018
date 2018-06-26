@@ -35,7 +35,7 @@ def main():
 		regress the enso and netcdf files
 	"""
 	# ========== Get the temperature data ==========
-	anuvals = NCopener(xval=20)
+	anuvals = NCopener(xval=24)
 
 #==============================================================================
 def NCopener(xval=24):

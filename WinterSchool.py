@@ -16,7 +16,7 @@ from collections import OrderedDict
 import warnings as warn
 from netCDF4 import Dataset, num2date 
 # Import plotting and colorpackages
-# import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 # import matplotlib.colors as mpc
 # import matplotlib as mpl
 # import palettable 
@@ -58,6 +58,11 @@ def NCopener(xval=24):
 	# calculate the extremes
 	tmin[tmin <xval] = 0
 	tmin[tmin>=xval] = 1
+
+	# test plot
+	plt.imshow(tmin[1, :, :])  
+	plt.colorbar()
+	plt.show()
 	ipdb.set_trace()
 
 

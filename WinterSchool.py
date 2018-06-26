@@ -61,10 +61,18 @@ def NCopener(xval=24):
 	# calculate a mean annual temperature and detrend
 	from scipy import signal
 	tmin_det = signal.detrend(tmin3, axis=2)
-	ipdb.set_trace()
+
+	# work out a date is in the referenc period 
+	yvals = range(1911, 1942)
+	ref = []
+	for vls in dates:
+		ref.append(vls in yvals)
+
+	refmean = np.mean(tmin3[:, :, ref], axis=2)
+	rfm = np.repeat(refmean[:, :, np.newaxis], tmin_det.shape[2], axis=2)
 	
 	# calculate the extremes
-	tmin = tmin_det.copy()
+	tmin = rfm + tmin_det
 
 	tmin[tmin <xval] = 0
 	tmin[tmin>=xval] = 1

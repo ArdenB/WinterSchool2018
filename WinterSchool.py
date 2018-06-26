@@ -44,12 +44,20 @@ def NCopener(xval=24):
 		value  for extreme  threshold
 	"""
 	# set the file name
-	fn = "./AWAP_sel_DJF.nc "
-
+	fn    = "./AWAP_sel_DJF.nc"
+	
 	# load the data
-	ncf1 = Dataset(fn, mode='r')
+	ncf1  = Dataset(fn, mode='r')
+	# pull out the data
+	tmin1 = np.asarray(ncf1.variables["tmin"][:])
+	
+	# convert to a standard rater format way can use with imshow
+	tmin2 = np.swapaxes(tmin1, 0, 2).astype(float)
+	tmin  = np.swapaxes(tmin2, 0, 1)
 
-	tmin = ncf1.variables["tmin"][:]
+	# calculate the extremes
+	tmin[tmin <xval] = 0
+	tmin[tmin>=xval] = 1
 	ipdb.set_trace()
 
 

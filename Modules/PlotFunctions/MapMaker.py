@@ -37,14 +37,6 @@ import matplotlib.pyplot as plt
 #==============================================================================
 def mapmaker(image, mapdet):
 	"""Function to Build some maps"""
-	# ========== Check the class of the input data ==========
-	# if type(mapdet).__name__ != 'mapclass':
-		# raise TypeError("mapdet must be of class mapclass")
-
-	# =========== convert the QRB to an SQRB image  ===========
-	# if not (mapdet.mask is None):
-		# image *= mapdet.mask
-
 	plt.rcParams.update({'figure.subplot.right' : 0.85 })
 	plt.rcParams.update({'figure.subplot.left' : 0.05 })
 
@@ -120,7 +112,6 @@ def mapmaker(image, mapdet):
 	# if not (mapdet.ticknm is None):
 	# 	cb.ax.set_yticklabels(mapdet.ticknm) 
 
-	# # plt.subplots_adjust(left=0.1, right=0.9, top=0.9, bottom=0.1)
 	# # ========== save the plot ==========
 	# if not (mapdet.plotpath is None):
 	# 	# Make a pdf version
@@ -129,18 +120,12 @@ def mapmaker(image, mapdet):
 	# 	plt.savefig(fnm_pdf)
 			
 	# 	# make png version 
-	# 	fname = "%s%d._BasicFigs_%s.png" % (
-	# 		mapdet.plotpath, (mapdet.column), mapdet.var)
-	# 	plt.savefig(fname)
-	# 	plotinfo = "PLOT INFO: Plot of %s made using %s:v.%s" % (
-	# 		mapdet.var, __title__, __version__)
-	# else:
-	# 	fname = None
-	# if mapdet.pshow:
+	fname = "./maps/Map_of_%s.png" % (mapdet.var)
+	plt.savefig(fname)
 	plt.show()
 	plt.close()
+
 	# Reset the the plt paramters to the defualts
 	plt.rcParams.update(plt.rcParamsDefault)
 	# return the infomation
-	# return plotinfo, fname
 

@@ -23,6 +23,7 @@ import matplotlib.pyplot as plt
 import matplotlib.colors as mpc
 import matplotlib as mpl
 import palettable 
+import Modules.PlotFunctions as pf
 # Import debugging packages 
 import ipdb
 
@@ -71,19 +72,16 @@ def NCopener(xval=24):
 		ref.append(vls in yvals)
 
 	refmean = np.mean(tmin3[:, :, ref], axis=2)
+	# make a 3d array containing the mean correction
 	rfm = np.repeat(refmean[:, :, np.newaxis], tmin_det.shape[2], axis=2)
 	
 	# calculate the extremes
 	tmin = rfm + tmin_det
-
 	tmin[tmin <xval] = 0
 	tmin[tmin>=xval] = 1
 
 
-
-
-
-	# Get an annual score
+	# Get the number of extreme events in each year
 	stack = []
 	years = range(1911, 2014)
 	for year in years:
@@ -91,36 +89,97 @@ def NCopener(xval=24):
 		ref = []
 		for dt in dates:
 			ref.append(dt == year)
-
 		stack.append(np.sum(tmin[:,:,ref], axis=2))
-	# stack the annual counds
+	# stack the annual counds of extere values
 	xccount = np.dstack(stack)
-	# test plot
 
 	# load the enso data
 	enso =  np.asarray(pd.read_csv("./best.csv")).reshape(-1) 
 
 	#  perform the regression
 	print("Starting the regressions")
+	
+	# get the regression coeficents (slope, intercept, r2, pvalue, std error)
 	coef = threeDloop(xccount, enso)
 
+	# mask p>0.05 (non significant)
+	slope = coef[:, :, 0] 
+	inter = coef[:, :, 1] #intercept
+	pval  = coef[:, :, 3] 
+	slope[pval>0.05] = np.NAN 
+	inter[pval>0.05] = np.NAN 
+	# coef[:, :, 0] = slope
+	# coef[:, :, 1] = inter
+
+
+
 	np.save("./regression_coef.npy", coef)
-	# plt.imshow(coef[:, :, 0])
-	# plt.colorbar()
-	# plt.show()
+
 
 	# make a map
-	import Modules.PlotFunctions as pf
-	# build an object to hold the metadata
-	mapdet = pf.mapclass(region="AUS")
-	mapdet.cmap = cmap = mpc.ListedColormap(palettable.colorbrewer.diverging.RdBu_8_r.mpl_colors)
-	mapdet.cmin = - 0.4
-	mapdet.cmax =   0.4
-	pf.mapmaker(coef[:, :, 0], mapdet)
-	ipdb.set_trace()
+	mapper(coef)
 
 #==============================================================================
+def mapper(coef):
+
+	"""Takes the recression coeficents and makes maps of them"""
+	
+	# =========== slope ===========
+ 	print("Map of the slope")
+	
+	# build an object to hold the metadata
+	# 	Cheat by using a class i built, 
+	#    its just a container for infomation for the plot
+	mapdet = pf.mapclass(region="AUS")
+	# pick a colormap
+	cmap = mpc.ListedColormap(palettable.colorbrewer.diverging.RdBu_8_r.mpl_colors)
+	cmap.set_bad(mapdet.maskcol)
+	mapdet.cmap = cmap
+	# set the min and max for the colormap
+	mapdet.cmin = - 0.4
+	mapdet.cmax =   0.4
+
+	# set thee title
+	mapdet.var  = "Slope"
+	pf.mapmaker(coef[:, :, 0], mapdet)
+	
+	# =========== R2 ===========
+ 	print("Map of the r2")
+	
+	# build an object to hold the metadata
+	# pick a colormap
+	cmap = mpc.ListedColormap(palettable.matplotlib.Magma_10.mpl_colors)
+	cmap.set_bad(mapdet.maskcol)
+	mapdet.cmap = cmap
+	# set the min and max for the colormap
+	mapdet.cmin   = 0
+	mapdet.cmax   = 1.0
+	mapdet.extend = "neither"
+	# set thee title
+	mapdet.var    = "R2"
+	pf.mapmaker(coef[:, :, 2], mapdet)
+	
+	# =========== p values ===========
+ 	print("Map of the p values")
+	
+	# build an object to hold the metadata
+	# pick a colormap
+	cmap = mpc.ListedColormap(palettable.matplotlib.Viridis_10.mpl_colors)
+	cmap.set_bad(mapdet.maskcol)
+	mapdet.cmap   = cmap
+	# set the min and max for the colormap
+	mapdet.cmin   = 0
+	mapdet.cmax   = 0.5
+	mapdet.extend = "max"
+	# set thee title
+	mapdet.var    = "pvalues"
+	pf.mapmaker(coef[:, :, 3], mapdet)
+
 def time_split(t):
+	"""
+	Function takes the dates from the netcdf and works out which 
+	year values belong too
+	"""
 	y,m,d = [],[],[]
 	for i in t:
 		y.append(int(i)/10000)

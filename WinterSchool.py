@@ -81,12 +81,12 @@ def NCopener(xval=24):
 def time_split(t):
 	y,m,d = [],[],[]
 	for i in t:
-		y.append(i/10000)
+		y.append(int(i)/10000)
 		m.append((i/100)%100)	
 	for j in range(len(m)):
 		if m[j] == 1 or m[j] == 2:
 			y[j] = y[j]-1
-	for i in y:
+	for i in range(len(y)):
 		if y[i] == y[0]:
 			y[i] = 0
 		if y[i] == y[-1]:

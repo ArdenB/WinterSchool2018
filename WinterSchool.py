@@ -65,7 +65,7 @@ def NCopener(xval=24):
 
 	# detrend the data
 	from scipy import signal
-	dtmin_det = signal.detrend(tmin, axis=2, type='linear')
+	tmin_det = signal.detrend(tmin, axis=2, type='linear')
 
 	# test plot
 	plt.imshow(np.sum(tmin_det, axis=2) )

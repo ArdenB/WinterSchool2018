@@ -16,10 +16,10 @@ from collections import OrderedDict
 import warnings as warn
 from netCDF4 import Dataset, num2date 
 # Import plotting and colorpackages
-import matplotlib.pyplot as plt
-import matplotlib.colors as mpc
-import matplotlib as mpl
-import palettable 
+# import matplotlib.pyplot as plt
+# import matplotlib.colors as mpc
+# import matplotlib as mpl
+# import palettable 
 # Import debugging packages 
 import ipdb
 

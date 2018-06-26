@@ -44,7 +44,8 @@ def NCopener(xval=24):
 		value  for extreme  threshold
 	"""
 	# set the file name
-	fn    = "./AWAP_sel_DJF.nc"
+	# fn    = "./AWAP_sel_DJF.nc"
+	fn 	  = "./AWAP_nondetrend_sel_DJF.nc"
 	
 	# load the data
 	ncf1  = Dataset(fn, mode='r')

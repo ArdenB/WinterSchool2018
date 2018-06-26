@@ -33,8 +33,13 @@ def main():
 		open the enso dataset
 		regress the enso and netcdf files
 	"""
+	# ========== Get the temperature data ==========
 
+#==============================================================================
+def NCopener():
+	""" """
 
+#==============================================================================
 
 if __name__ == '__main__':
 	main()

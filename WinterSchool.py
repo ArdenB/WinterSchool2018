@@ -10,7 +10,9 @@ __email__ = "arden.burrell@gmail.com"
 # Import packages
 import numpy as np
 import scipy as sp
+from scipy import stats
 import pandas as pd
+from numba import jit
 import argparse
 import datetime as dt
 from collections import OrderedDict
@@ -94,7 +96,14 @@ def NCopener(xval=24):
 	# stack the annual counds
 	xccount = np.dstack(stack)
 	# test plot
-	plt.imshow(xccount[:, :, 1])
+
+	# load the enso data
+	enso =  np.asarray(pd.read_csv("./best.csv")).reshape(-1) 
+
+	#  perform the regression
+	print("Starting the regressions")
+	coef = threeDloop(xccount, enso)
+	plt.imshow(coef[:, :, 0])
 	plt.colorbar()
 	plt.show()
 
@@ -118,6 +127,34 @@ def time_split(t):
 	# print(y)
    	return y
 
+@jit
+def threeDloop(xccount, enso):
+
+	coef = np.zeros((xccount.shape[0], xccount.shape[1], 5))
+	# loop ove the y and x dim
+	for y in range(0, xccount.shape[0]):
+		for x in range(0, xccount.shape[1]):
+			coef[y, x, :] = scipyols(xccount[y, x, :], enso)
+	return coef
+
+@jit
+def scipyols(array, enso):
+	"""
+	Function for rapid OLS with time. the regression is done with 
+	an independent variable rangeing from 0 to array.shape to make
+	the intercept the start which simplifies calculation
+	args:
+		array 		np : numpy array of annual max VI over time 
+	return
+		result 		np : change(total change between start and end)
+						 slope, intercept, rsquared, pvalue, std_error
+	"""
+	# +++++ Get the OLS +++++
+	slope, intercept, r_value, p_value, std_err = stats.linregress(
+		np.arange(array.shape[0]), array)
+	# +++++ calculate the total change +++++
+	# +++++ return the results +++++
+	return np.array([slope, intercept, r_value**2, p_value, std_err])
 
 
 if __name__ == '__main__':

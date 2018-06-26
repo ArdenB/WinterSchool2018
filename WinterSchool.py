@@ -57,23 +57,24 @@ def NCopener(xval=24):
 	tmin2  = np.swapaxes(tmin1, 0, 2).astype(float)
 	tmin3  = np.swapaxes(tmin2, 0, 1)
 
+	# detrend the data
+	from scipy import signal
+	tmin_det = signal.detrend(tmin3, axis=2, type='linear')
+	
 	# calculate the extremes
-	tmin = tmin3.copy()
+	tmin = tmin_det.copy()
 
 	tmin[tmin <xval] = 0
 	tmin[tmin>=xval] = 1
 
-	# detrend the data
-	from scipy import signal
-	tmin_det = signal.detrend(tmin, axis=2, type='linear')
 
 	# test plot
-	plt.imshow(np.sum(tmin_det, axis=2) )
+	plt.imshow(np.sum(tmin, axis=2) )
 	plt.colorbar()
 	plt.show()
 
 	# Print the max number
-	print(np.max(np.sum(tmin_det, axis=2))) 
+	print(np.max(np.sum(tmin, axis=2))) 
 	# ipdb.set_trace()
 
 #==============================================================================

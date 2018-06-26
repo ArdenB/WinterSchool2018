@@ -59,7 +59,9 @@ def NCopener(xval=24):
 	tmin3  = np.swapaxes(tmin2, 0, 1)
 
 	# calculate a mean annual temperature and detrend
-	tmin_det = detrender(tmin3, dates)
+	from scipy import signal
+	tmin_det = signal.detrend(tmin3, axis=2)
+	ipdb.set_trace()
 	
 	# calculate the extremes
 	tmin = tmin_det.copy()
@@ -86,12 +88,13 @@ def time_split(t):
 	for j in range(len(m)):
 		if m[j] == 1 or m[j] == 2:
 			y[j] = y[j]-1
+	a = y[0]
 	for i in range(len(y)):
-		if y[i] == y[0]:
+		if y[i] == a:
 			y[i] = 0
 		if y[i] == y[-1]:
 			y[i] = 0
-	print(y)
+	# print(y)
    	return y
 
 

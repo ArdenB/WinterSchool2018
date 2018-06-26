@@ -52,15 +52,17 @@ def NCopener(xval=24):
 	tmin1 = np.asarray(ncf1.variables["tmin"][:])
 	
 	# convert to a standard rater format way can use with imshow
-	tmin2 = np.swapaxes(tmin1, 0, 2).astype(float)
-	tmin  = np.swapaxes(tmin2, 0, 1)
+	tmin2  = np.swapaxes(tmin1, 0, 2).astype(float)
+	tmin3  = np.swapaxes(tmin2, 0, 1)
 
 	# calculate the extremes
+	tmin = tmin3.copy()
+
 	tmin[tmin <xval] = 0
 	tmin[tmin>=xval] = 1
 
 	# test plot
-	plt.imshow(tmin[1, :, :])  
+	plt.imshow(np.sum(tmin, axis=2)  
 	plt.colorbar()
 	plt.show()
 	ipdb.set_trace()

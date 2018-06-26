@@ -62,7 +62,7 @@ def NCopener(xval=24):
 	tmin[tmin>=xval] = 1
 
 	# test plot
-	plt.imshow(np.sum(tmin, axis=2)  
+	plt.imshow(np.sum(tmin, axis=2) )
 	plt.colorbar()
 	plt.show()
 	ipdb.set_trace()

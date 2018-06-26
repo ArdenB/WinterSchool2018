@@ -52,15 +52,14 @@ def NCopener(xval=24):
 	ncf1  = Dataset(fn, mode='r')
 	# pull out the data
 	tmin1 = np.asarray(ncf1.variables["tmin"][:])
-	dates = ymonday(ncf1.variables["time"][:])
+	dates = time_split(ncf1.variables["time"][:])
 	
 	# convert to a standard rater format way can use with imshow
 	tmin2  = np.swapaxes(tmin1, 0, 2).astype(float)
 	tmin3  = np.swapaxes(tmin2, 0, 1)
 
-	# detrend the data
-	from scipy import signal
-	tmin_det = signal.detrend(tmin3, axis=2, type='linear')
+	# calculate a mean annual temperature and detrend
+	tmin_det = detrender(tmin3, dates)
 	
 	# calculate the extremes
 	tmin = tmin_det.copy()
@@ -79,14 +78,21 @@ def NCopener(xval=24):
 	ipdb.set_trace()
 
 #==============================================================================
-# def ymonday( dates ):
-# 	y,m,d = [],[],[]
-# 	for i in dates:
-# 		y.append(int(i)/10000)
-# 		m.append((i/100)%100)
-# 		d.append(i%100)
-# 	ipdb.set_trace()
-# 	return y,m,d
+def time_split(t):
+	y,m,d = [],[],[]
+	for i in t:
+		y.append(i/10000)
+		m.append((i/100)%100)	
+	for j in range(len(m)):
+		if m[j] == 1 or m[j] == 2:
+			y[j] = y[j]-1
+	for i in y:
+		if y[i] == y[0]:
+			y[i] = 0
+		if y[i] == y[-1]:
+			y[i] = 0
+	print(y)
+   	return y
 
 
 

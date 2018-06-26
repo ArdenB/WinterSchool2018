@@ -34,7 +34,7 @@ def main():
 		regress the enso and netcdf files
 	"""
 	# ========== Get the temperature data ==========
-	anuvals = NCopener(xval=24)
+	anuvals = NCopener(xval=20)
 
 #==============================================================================
 def NCopener(xval=24):
@@ -65,6 +65,9 @@ def NCopener(xval=24):
 	plt.imshow(np.sum(tmin, axis=2) )
 	plt.colorbar()
 	plt.show()
+
+	# Print the max number
+	print(np.max(np.sum(tmin, axis=2))) 
 	ipdb.set_trace()
 
 

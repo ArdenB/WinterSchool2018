@@ -22,7 +22,7 @@ import matplotlib.pyplot as plt
 # import matplotlib as mpl
 # import palettable 
 # Import debugging packages 
-# import ipdb
+import ipdb
 
 #==============================================================================
 
@@ -52,6 +52,7 @@ def NCopener(xval=24):
 	ncf1  = Dataset(fn, mode='r')
 	# pull out the data
 	tmin1 = np.asarray(ncf1.variables["tmin"][:])
+	dates = ymonday(ncf1.variables["time"][:])
 	
 	# convert to a standard rater format way can use with imshow
 	tmin2  = np.swapaxes(tmin1, 0, 2).astype(float)
@@ -75,9 +76,19 @@ def NCopener(xval=24):
 
 	# Print the max number
 	print(np.max(np.sum(tmin, axis=2))) 
-	# ipdb.set_trace()
+	ipdb.set_trace()
 
 #==============================================================================
+# def ymonday( dates ):
+# 	y,m,d = [],[],[]
+# 	for i in dates:
+# 		y.append(int(i)/10000)
+# 		m.append((i/100)%100)
+# 		d.append(i%100)
+# 	ipdb.set_trace()
+# 	return y,m,d
+
+
 
 if __name__ == '__main__':
 	main()

@@ -113,7 +113,7 @@ def NCopener(xval=29):
 	np.save("./regression_coef_ENSO.npy", coef)
 
 	# make a map
-	# mapper(coef, "ENSO (NINO 3.4)")
+	mapper(coef, "ENSO (NINO 3.4)")
 	coef = None 
 
 	# load the enso data
@@ -129,7 +129,7 @@ def NCopener(xval=29):
 	inter[pval>0.05] = np.NAN 
 	np.save("./regression_coef_IOD.npy", coef)
 	# make a map
-	# mapper(coef, "IOD (DMI)")
+	mapper(coef, "IOD (DMI)")
 
 	coef = None 
 	coef = threeDloop(xccount, enso, IOD)
@@ -223,7 +223,7 @@ def time_split(t):
 	# print(y)
    	return y
 
-# @jit
+@jit
 def threeDloop(xccount, index, other=None):
 
 	coef = np.zeros((xccount.shape[0], xccount.shape[1], 5))
@@ -271,8 +271,7 @@ def MV_OLS(df):
 	mod = smf.ols(formula = 'nights~enso*IOD', data=df).fit()
 	# ===== Pull out key values =====
 	# change   = mod.fittedvalues[33] - mod.fittedvalues[0] - bh
-	ipdb.set_trace()
-	r2_value = mod.rsquared 
+	r2_value = mod.rsquared_adj
 	p_value  = mod.f_pvalue
 	return np.array([np.NAN, np.NAN, r2_value, p_value, np.NAN])
 if __name__ == '__main__':

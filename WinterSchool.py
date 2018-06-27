@@ -23,6 +23,7 @@ import matplotlib.pyplot as plt
 import matplotlib.colors as mpc
 import matplotlib as mpl
 import palettable 
+import statsmodels.formula.api as smf
 import Modules.PlotFunctions as pf
 # Import debugging packages 
 import ipdb
@@ -41,7 +42,7 @@ def main():
 	anuvals = NCopener(xval=24)
 
 #==============================================================================
-def NCopener(xval=24):
+def NCopener(xval=29):
 	"""
 	Function opens the detrended NC file, then precesses it
 	args:
@@ -93,12 +94,13 @@ def NCopener(xval=24):
 	# stack the annual counds of extere values
 	xccount = np.dstack(stack)
 
-	# load the enso data
-	enso =  np.asarray(pd.read_csv("./best.csv")).reshape(-1) 
-
 	#  perform the regression
 	print("Starting the regressions")
 	
+	# load the enso data
+	enso =  np.asarray(pd.read_csv("./best.csv")).reshape(-1) 
+	IOD =  np.asarray(pd.read_csv("./dmi_std.csv")).reshape(-1) 
+
 	# get the regression coeficents (slope, intercept, r2, pvalue, std error)
 	coef = threeDloop(xccount, enso)
 
@@ -108,39 +110,64 @@ def NCopener(xval=24):
 	pval  = coef[:, :, 3] 
 	slope[pval>0.05] = np.NAN 
 	inter[pval>0.05] = np.NAN 
-	# coef[:, :, 0] = slope
-	# coef[:, :, 1] = inter
-
-
-
-	np.save("./regression_coef.npy", coef)
-
+	np.save("./regression_coef_ENSO.npy", coef)
 
 	# make a map
-	mapper(coef)
+	# mapper(coef, "ENSO (NINO 3.4)")
+	coef = None 
+
+	# load the enso data
+	
+	# get the regression coeficents (slope, intercept, r2, pvalue, std error)
+	coef = threeDloop(xccount, IOD)
+
+	# mask p>0.05 (non significant)
+	slope = coef[:, :, 0] 
+	inter = coef[:, :, 1] #intercept
+	pval  = coef[:, :, 3] 
+	slope[pval>0.05] = np.NAN 
+	inter[pval>0.05] = np.NAN 
+	np.save("./regression_coef_IOD.npy", coef)
+	# make a map
+	# mapper(coef, "IOD (DMI)")
+
+	coef = None 
+	coef = threeDloop(xccount, enso, IOD)
+
+	# mask p>0.05 (non significant)
+	slope = coef[:, :, 0] 
+	inter = coef[:, :, 1] #intercept
+	pval  = coef[:, :, 3] 
+	slope[pval>0.05] = np.NAN 
+	inter[pval>0.05] = np.NAN 
+	np.save("./regression_coef_IODandENso.npy", coef)
+	mapper(coef, "ENSOandIOD")
+
+
+
 
 #==============================================================================
-def mapper(coef):
+def mapper(coef, varmode):
 
 	"""Takes the recression coeficents and makes maps of them"""
 	
 	# =========== slope ===========
- 	print("Map of the slope")
+ 	print("Map of the slope Hot Nigths vs %s " % varmode)
 	
 	# build an object to hold the metadata
 	# 	Cheat by using a class i built, 
 	#    its just a container for infomation for the plot
 	mapdet = pf.mapclass(region="AUS")
 	# pick a colormap
-	cmap = mpc.ListedColormap(palettable.colorbrewer.diverging.RdBu_8_r.mpl_colors)
+	cmap = mpc.ListedColormap(palettable.colorbrewer.diverging.RdBu_10_r.mpl_colors)
 	cmap.set_bad(mapdet.maskcol)
 	mapdet.cmap = cmap
 	# set the min and max for the colormap
-	mapdet.cmin = - 0.4
-	mapdet.cmax =   0.4
+	mapdet.cmin =  -10.0
+	mapdet.cmax =   10.0
 
 	# set thee title
-	mapdet.var  = "Slope"
+	mapdet.var  = "HotNightsvs%s_Slope" %  varmode
 	pf.mapmaker(coef[:, :, 0], mapdet)
 	
 	# =========== R2 ===========
@@ -153,10 +180,10 @@ def mapper(coef):
 	mapdet.cmap = cmap
 	# set the min and max for the colormap
 	mapdet.cmin   = 0
-	mapdet.cmax   = 1.0
+	mapdet.cmax   = 0.5
 	mapdet.extend = "neither"
 	# set thee title
-	mapdet.var    = "R2"
+	mapdet.var    = "HotNightsvs%s_R2" %  varmode
 	pf.mapmaker(coef[:, :, 2], mapdet)
 	
 	# =========== p values ===========
@@ -172,7 +199,7 @@ def mapper(coef):
 	mapdet.cmax   = 0.5
 	mapdet.extend = "max"
 	# set thee title
-	mapdet.var    = "pvalues"
+	mapdet.var    = "HotNightsvs%s_pvalues" %  varmode
 	pf.mapmaker(coef[:, :, 3], mapdet)
 
 def time_split(t):
@@ -196,18 +223,22 @@ def time_split(t):
 	# print(y)
    	return y
 
-@jit
-def threeDloop(xccount, enso):
+# @jit
+def threeDloop(xccount, index, other=None):
 
 	coef = np.zeros((xccount.shape[0], xccount.shape[1], 5))
 	# loop ove the y and x dim
 	for y in range(0, xccount.shape[0]):
 		for x in range(0, xccount.shape[1]):
-			coef[y, x, :] = scipyols(xccount[y, x, :], enso)
+			if other is None:
+				coef[y, x, :] = scipyols(xccount[y, x, :], index)
+			else:
+				df = pd.DataFrame({"nights":xccount[y, x, :], "enso":index, "IOD":other})
+				coef[y, x, :] = MV_OLS(df)
 	return coef
 
 @jit
-def scipyols(array, enso):
+def scipyols(array, index):
 	"""
 	Function for rapid OLS with time. the regression is done with 
 	an independent variable rangeing from 0 to array.shape to make
@@ -219,12 +250,30 @@ def scipyols(array, enso):
 						 slope, intercept, rsquared, pvalue, std_error
 	"""
 	# +++++ Get the OLS +++++
-	slope, intercept, r_value, p_value, std_err = stats.linregress(
-		np.arange(array.shape[0]), array)
+	slope, intercept, r_value, p_value, std_err = stats.linregress(index, array)
 	# +++++ calculate the total change +++++
 	# +++++ return the results +++++
 	return np.array([slope, intercept, r_value**2, p_value, std_err])
 
-
+def MV_OLS(df):
+	"""
+	Function for rapid OLS with time. the regression is done with 
+	an independent variable rangeing from 0 to array.shape to make
+	the intercept the start which simplifies calculation
+	args:
+		array 		np : numpy array of annual max VI over time 
+		dummy 		np : numpy array containg the breakpoint variable
+	return
+		result 		np : change(total change between start and end)
+	"""
+			
+	# ========== Fit the regression ============
+	mod = smf.ols(formula = 'nights~enso*IOD', data=df).fit()
+	# ===== Pull out key values =====
+	# change   = mod.fittedvalues[33] - mod.fittedvalues[0] - bh
+	ipdb.set_trace()
+	r2_value = mod.rsquared 
+	p_value  = mod.f_pvalue
+	return np.array([np.NAN, np.NAN, r2_value, p_value, np.NAN])
 if __name__ == '__main__':
 	main()

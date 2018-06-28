@@ -54,7 +54,7 @@ def mapmaker(image, mapdet):
 		extent=mapdet.bounds, 
 		cmap=mapdet.cmap, 
 		norm=mapdet.norm, 
-		origin='lower',
+		origin=mapdet.origin,
 		) # added after australia looked lame
 
 

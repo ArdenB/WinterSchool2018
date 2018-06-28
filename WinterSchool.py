@@ -93,7 +93,7 @@ def NCopener(xval=29):
 		stack.append(np.sum(tmin[:,:,ref], axis=2))
 	# stack the annual counds of extere values
 	xccount = np.dstack(stack)
-	ipdb.set_trace()
+	count_map(xccount)
 
 	#  perform the regression
 	print("Starting the regressions")
@@ -104,7 +104,7 @@ def NCopener(xval=29):
 
 	# get the regression coeficents (slope, intercept, r2, pvalue, std error)
 	coef = threeDloop(xccount, enso)
-
+	ipdb.set_trace()
 	# mask p>0.05 (non significant)
 	slope = coef[:, :, 0] 
 	inter = coef[:, :, 1] #intercept
@@ -148,6 +148,28 @@ def NCopener(xval=29):
 
 
 #==============================================================================
+def count_map(xccount):
+
+	xmean = np.nanmean(xccount, axis=2)
+
+	mapdet = pf.mapclass(region="AUS")
+	# pick a colormap
+	# cmap = mpc.ListedColormap(palettable.colorbrewer.diverging.RdBu_8_r.mpl_colors)
+	cmap   = plt.cm.viridis
+	# set the min and max for the colormap
+	mapdet.cmin =   0
+	mapdet.cmax =   90
+	mapdet.origin = "upper"
+	mapdet.extend = "neither"
+
+	# set thee title
+	mapdet.var  = "HotNights"
+	pf.mapmaker(xmean, mapdet)
+
+
+
+	pass
+
 def mapper(coef, varmode):
 
 	"""Takes the recression coeficents and makes maps of them"""

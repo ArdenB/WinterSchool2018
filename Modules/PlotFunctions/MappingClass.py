@@ -59,6 +59,7 @@ class mapclass(object):
 		# Extend the colorbar to cover any data outside the cmap range
 		self.extend   = "both" 
 		self.spacing  = 'uniform'
+		self.origin   = 'lower'
 		
 
 

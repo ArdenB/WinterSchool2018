@@ -93,13 +93,14 @@ def NCopener(xval=29):
 		stack.append(np.sum(tmin[:,:,ref], axis=2))
 	# stack the annual counds of extere values
 	xccount = np.dstack(stack)
+	ipdb.set_trace()
 
 	#  perform the regression
 	print("Starting the regressions")
 	
 	# load the enso data
 	enso =  np.asarray(pd.read_csv("./best.csv")).reshape(-1) 
-	IOD =  np.asarray(pd.read_csv("./dmi_std.csv")).reshape(-1) 
+	IOD  =  np.asarray(pd.read_csv("./dmi_std.csv")).reshape(-1) 
 
 	# get the regression coeficents (slope, intercept, r2, pvalue, std error)
 	coef = threeDloop(xccount, enso)
@@ -159,12 +160,12 @@ def mapper(coef, varmode):
 	#    its just a container for infomation for the plot
 	mapdet = pf.mapclass(region="AUS")
 	# pick a colormap
-	cmap = mpc.ListedColormap(palettable.colorbrewer.diverging.RdBu_10_r.mpl_colors)
+	cmap = mpc.ListedColormap(palettable.colorbrewer.diverging.RdBu_8_r.mpl_colors)
 	cmap.set_bad(mapdet.maskcol)
 	mapdet.cmap = cmap
 	# set the min and max for the colormap
-	mapdet.cmin =  -10.0
-	mapdet.cmax =   10.0
+	mapdet.cmin =  -8.0
+	mapdet.cmax =   8.0
 
 	# set thee title
 	mapdet.var  = "HotNightsvs%s_Slope" %  varmode
@@ -175,13 +176,13 @@ def mapper(coef, varmode):
 	
 	# build an object to hold the metadata
 	# pick a colormap
-	cmap = mpc.ListedColormap(palettable.matplotlib.Magma_10.mpl_colors)
+	cmap = mpc.ListedColormap(palettable.matplotlib.Magma_8.mpl_colors)
 	cmap.set_bad(mapdet.maskcol)
 	mapdet.cmap = cmap
 	# set the min and max for the colormap
 	mapdet.cmin   = 0
-	mapdet.cmax   = 0.5
-	mapdet.extend = "neither"
+	mapdet.cmax   = 0.2
+	mapdet.extend = "max"
 	# set thee title
 	mapdet.var    = "HotNightsvs%s_R2" %  varmode
 	pf.mapmaker(coef[:, :, 2], mapdet)

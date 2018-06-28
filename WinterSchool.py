@@ -104,7 +104,7 @@ def NCopener(xval=29):
 
 	# get the regression coeficents (slope, intercept, r2, pvalue, std error)
 	coef = threeDloop(xccount, enso)
-	ipdb.set_trace()
+
 	# mask p>0.05 (non significant)
 	slope = coef[:, :, 0] 
 	inter = coef[:, :, 1] #intercept
